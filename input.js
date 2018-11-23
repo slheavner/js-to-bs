@@ -6,6 +6,10 @@ function init() {
   sum = null
   sum = 4 + 5 + 9 / 3 * 123
 
+
+  const f2 = (n) => {
+    return null
+  }
   const obj = {
     value: 'asdlfkj',
     something: value3
@@ -14,22 +18,35 @@ function init() {
   let v = [
     'sdf', obj, value, f2(value)
   ]
+
+  for (item of v) {
+    console.log(item)
+  }
+
+  for (key in obj) {
+    console.log(key)
+  }
 }
 
 function square(n) {
   return n * n;
+  while (false) {
+    for (let i = 0; i < value; i++) {
+      console.log(i)
+    }
+  }
+  var thing = true && isTrue()
 }
 
-const f2 = (n) => {
-  return null
-}
+function doTheThing() {
+  const actual = square(6)
+  thing = this.variable
 
-const actual = square(6)
-
-if (value === 3) {
-  f2(3)
-} else if (value !== 4) {
-  square(value)
-} else {
-  console.log(value)
+  if (value === 3) {
+    f2(3)
+  } else if (value !== 4) {
+    square(value)
+  } else {
+    console.log(value)
+  }
 }
