@@ -6,6 +6,8 @@ function init() {
   sum = null
   sum = 4 + 5 + 9 / 3 * 123
 
+  d = new roDateTime(100) //random param to test
+
 
   const f2 = (n) => {
     return null

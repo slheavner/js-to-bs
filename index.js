@@ -14,7 +14,7 @@ const formatOperator = (op) => {
     op = 'and'
   } else if (op === '||') {
     op = 'or'
-  } else if (op in ['&', '|', '<<', '>>']) {
+  } else if (['&', '|', '<<', '>>', '+', '-', '/', '*', '<', '>'].includes(op)) {
 
   } else {
     console.error('unable to recognize operator ' + op)
@@ -26,7 +26,7 @@ const formatParams = params => {
   return params.map(node => node.bs).join(', ')
 }
 
-const toBRS = (code) => {
+exports.toBRS = (code) => {
   const ast = parser.parse(code);
 
   traverse(ast, {
@@ -169,6 +169,11 @@ const toBRS = (code) => {
         case 'LogicalExpression':
           node.bs = `${node.left.bs} ${formatOperator(node.operator)} ${node.right.bs}`
           return
+        case 'NewExpression':
+          params = node.arguments.length === 0 ? '' :
+            `, ${node.arguments.map(v => v.bs).join(', ')}`
+          node.bs = `createObject("${node.callee.bs}"${params})`
+          return
         case 'ConditionalExpression':
           throw 'cannot use conditional expressions'
         default:
@@ -179,4 +184,4 @@ const toBRS = (code) => {
 
 }
 
-toBRS(fs.readFileSync(process.argv[2], 'utf-8'))
+exports.toBRS(fs.readFileSync(process.argv[2], 'utf-8'))

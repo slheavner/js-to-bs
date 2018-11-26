@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<component name="MyScene" extends="Scene"  xsi:noNamespaceSchemaLocation="https://devtools.web.roku.com/schema/RokuSceneGraph.xsd">
+
+  <interface>
+    <field id="port" type="assocarray" />
+    <field id="config" type="node"/>
+  </interface>
+
+	<script type="text/brightscript" uri="pkg:/components/MyScene.brs"/>
+  <children>
+  </children>
+</component>
