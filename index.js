@@ -26,7 +26,15 @@ const formatParams = params => {
   return params.map(node => node.bs).join(', ')
 }
 
-exports.toBRS = (code) => {
+const writeBrs = (node, name) => {
+  const data = bsFormatter.format(
+    node.body.map(node => node.bs).join('\n')
+  )
+  console.log(data)
+  fs.writeFileSync(name, data)
+}
+
+exports.toBRS = (code, name = 'out.brs') => {
   const ast = parser.parse(code);
 
   traverse(ast, {
@@ -91,11 +99,7 @@ exports.toBRS = (code) => {
   ${alternate}`
           return
         case 'Program':
-          const data = bsFormatter.format(
-            node.body.map(node => node.bs).join('\n')
-          )
-          console.log(data)
-          fs.writeFileSync('./out.brs', data)
+          writeBrs(node, name)
           return
         case 'FunctionDeclaration':
           node.bs = `
@@ -184,4 +188,4 @@ exports.toBRS = (code) => {
 
 }
 
-exports.toBRS(fs.readFileSync(process.argv[2], 'utf-8'))
+// exports.toBRS(fs.readFileSync(process.argv[2], 'utf-8'))

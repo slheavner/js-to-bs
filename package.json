@@ -11,6 +11,9 @@
     "@babel/template": "^7.1.2",
     "@babel/traverse": "^7.1.4",
     "@willowtreeapps/wist": "^2.0.1",
-    "brightscript-formatter": "^1.4.0"
+    "brightscript-formatter": "^1.4.0",
+    "fs-extra": "^7.0.1",
+    "klaw-sync": "^6.0.0",
+    "path": "^0.12.7"
   }
 }

@@ -7,9 +7,9 @@
     "type": "node",
     "request": "launch",
     "name": "Launch Program",
-    "program": "${workspaceFolder}/index.js",
+    "program": "${workspaceFolder}/jbs.js",
     "args": [
-      "input.js"
+      "./sample"
     ]
   }]
 }
