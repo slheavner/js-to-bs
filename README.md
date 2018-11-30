@@ -4,6 +4,6 @@
 
 Uses babel to convert Javascript syntax to BrightScript syntax.
 
-`node index.js <BRS file>`
+`node jbs.js <BRS file|project dir>`
 
 What have I done...
