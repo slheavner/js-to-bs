@@ -1,9 +1,11 @@
-const parser = require("@babel/parser")
-const traverse = require("@babel/traverse").default
+const parser = require('@babel/parser')
+const traverse = require('@babel/traverse').default
 const fs = require('fs')
 const BrightScriptFormatter = require('brightscript-formatter').BrightScriptFormatter
 const bsFormatter = new BrightScriptFormatter()
-const formatOperator = (op) => {
+const pollyfill = require('./pollyfill')
+
+const formatOperator = op => {
   if (op === '!') {
     op = 'not'
   } else if (op.startsWith('!=')) {
@@ -15,11 +17,10 @@ const formatOperator = (op) => {
   } else if (op === '||') {
     op = 'or'
   } else if (['&', '|', '<<', '>>', '+', '-', '/', '*', '<', '>'].includes(op)) {
-
   } else {
     console.error('unable to recognize operator ' + op)
   }
-  return op;
+  return op
 }
 
 const formatParams = params => {
@@ -27,21 +28,16 @@ const formatParams = params => {
 }
 
 const writeBrs = (node, name) => {
-  const data = bsFormatter.format(
-    node.body.map(node => node.bs).join('\n')
-  )
-  console.log(data)
+  const data = bsFormatter.format(node.body.map(node => node.bs).join('\n'))
   fs.writeFileSync(name, data)
 }
 
 exports.toBRS = (code, name = 'out.brs') => {
-  const ast = parser.parse(code);
-
+  const ast = parser.parse(code)
+  fills = []
   traverse(ast, {
     exit(path) {
-      const {
-        node
-      } = path
+      const { node } = path
       switch (path.type) {
         case 'StringLiteral':
           node.bs = `"${node.value.replace(/"/g, '""')}"`
@@ -50,8 +46,7 @@ exports.toBRS = (code, name = 'out.brs') => {
           node.bs = node.name
           return
         case 'VariableDeclarator':
-          node.bs = node.init ? `${node.id.bs} = ${node.init.bs}` :
-            `${node.id.bs} = invalid`
+          node.bs = node.init ? `${node.id.bs} = ${node.init.bs}` : `${node.id.bs} = invalid`
           return
         case 'VariableDeclaration':
           node.bs = node.declarations.map(node => node.bs).join('\n')
@@ -60,10 +55,13 @@ exports.toBRS = (code, name = 'out.brs') => {
           node.bs = `"${node.value.raw}"`
           return
         case 'TemplateLiteral':
-          node.bs = node.expressions.concat(node.quasis)
+          node.bs = node.expressions
+            .concat(node.quasis)
             .sort((a, b) => {
               return a.start - b.start
-            }).map(node => node.bs).join(' + ')
+            })
+            .map(node => node.bs)
+            .join(' + ')
           return
         case 'FunctionExpression':
         case 'ArrowFunctionExpression':
@@ -76,6 +74,10 @@ exports.toBRS = (code, name = 'out.brs') => {
           return
         case 'CallExpression':
           node.bs = `${node.callee.bs}(${formatParams(node.arguments)})`
+          if (node.callee.property && pollyfill[node.callee.property.bs]) {
+            node.bs = pollyfill[node.callee.property.bs].convert(node)
+            fills.push(node.callee.property.bs)
+          }
           return
         case 'ExpressionStatement':
           node.bs = node.expression.bs
@@ -88,17 +90,22 @@ exports.toBRS = (code, name = 'out.brs') => {
           }
           return
         case 'IfStatement':
-          const alternate = node.alternate ? `else ${
-            node.alternate.bs.startsWith('if') ? '' : '\n  '
-          }${node.alternate.bs}${
-      node.alternate.bs.endsWith('end if') ? '' : '\nend if'
-    }` : '\nend if'
+          const alternate = node.alternate
+            ? `else ${node.alternate.bs.startsWith('if') ? '' : '\n  '}${node.alternate.bs}${
+                node.alternate.bs.endsWith('end if') ? '' : '\nend if'
+              }`
+            : '\nend if'
 
           node.bs = `if ${node.test.bs} then
     ${node.consequent.bs}
   ${alternate}`
           return
         case 'Program':
+          if (fills && fills.length) {
+            fills.forEach(f => {
+              node.body.push(pollyfill[f])
+            })
+          }
           writeBrs(node, name)
           return
         case 'FunctionDeclaration':
@@ -174,8 +181,8 @@ exports.toBRS = (code, name = 'out.brs') => {
           node.bs = `${node.left.bs} ${formatOperator(node.operator)} ${node.right.bs}`
           return
         case 'NewExpression':
-          params = node.arguments.length === 0 ? '' :
-            `, ${node.arguments.map(v => v.bs).join(', ')}`
+          params =
+            node.arguments.length === 0 ? '' : `, ${node.arguments.map(v => v.bs).join(', ')}`
           node.bs = `createObject("${node.callee.bs}"${params})`
           return
         case 'ConditionalExpression':
@@ -183,9 +190,8 @@ exports.toBRS = (code, name = 'out.brs') => {
         default:
           console.log(`Bad Node Type: ${path.type}`)
       }
-    }
-  });
-
+    },
+  })
 }
 
 // exports.toBRS(fs.readFileSync(process.argv[2], 'utf-8'))
