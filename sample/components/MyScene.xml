@@ -1,13 +1,25 @@
 <?xml version="1.0" encoding="utf-8" ?>
 
-<component name="MyScene" extends="Scene"  xsi:noNamespaceSchemaLocation="https://devtools.web.roku.com/schema/RokuSceneGraph.xsd">
+<component xsi:noNamespaceSchemaLocation="https://devtools.web.roku.com/schema/RokuSceneGraph.xsd"
+  name="MyScene"
+  extends="Scene"
+  initialFocus="contentGrid">
 
   <interface>
-    <field id="port" type="assocarray" />
-    <field id="config" type="node"/>
+    <field id="A_custom" type="string"/>
   </interface>
-
+	<script type="text/brightscript" uri="pkg:/source/util/api.brs"/>
 	<script type="text/brightscript" uri="pkg:/components/MyScene.brs"/>
   <children>
+    <PosterGrid id="contentGrid"
+      basePosterSize="[480, 360]"
+      itemSpacing="[50, 50]"
+      numColumns="3"
+      numRows="4"
+      translation="[190, 50]"
+      caption1NumLines="1"
+      caption2NumLines="1"
+      captionVertAlignment="bottom"/>
+    <Video id="videoPlayer" visible="false" />
   </children>
 </component>

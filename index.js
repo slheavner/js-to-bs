@@ -6,24 +6,6 @@ const bsFormatter = new BrightScriptFormatter()
 const pollyfills = require('./pollyfills')
 const converters = require('./converters')
 
-const formatOperator = op => {
-  if (op === '!') {
-    op = 'not'
-  } else if (op.startsWith('!=')) {
-    op = '<>'
-  } else if (op.startsWith('==')) {
-    op = '='
-  } else if (op === '&&') {
-    op = 'and'
-  } else if (op === '||') {
-    op = 'or'
-  } else if (['&', '|', '<<', '>>', '+', '-', '/', '*', '<', '>'].includes(op)) {
-  } else {
-    console.error('unable to recognize operator ' + op)
-  }
-  return op
-}
-
 const writeBrs = (node, name) => {
   const data = bsFormatter.format(node.body.map(node => node.bs).join('\n'))
   fs.writeFileSync(name, data)

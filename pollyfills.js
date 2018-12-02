@@ -75,9 +75,20 @@ const fills = {
   },
   includes: {
     bs: `
-    function _includes(str, include, position = 0)
-      return instr(position, str, include) > 0
-    end function
+    function _includes(o, include, position = 0)
+    t = type(o)
+    if t = "String" or t = "roString" then
+        return instr(position, o, include) > 0
+    else if t = "roArray" then
+        for each s in o
+            if s = include
+                return true
+            end if
+        end for
+    else
+        return false
+    end if
+end function
     `,
     test: node => {
       return (

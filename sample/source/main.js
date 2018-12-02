@@ -10,8 +10,11 @@ function showScene(params) {
   this.screen = new roSGScreen()
   this.port = new roMessagePort()
   this.screen.setMessagePort(this.port)
-  scene = this.screen.createScene('MyScene')
-
+  this.screen.createScene('MyScene')
+  const data = parseJson(ReadAsciiFile('pkg:/resources/api.json'))
+  this.screen.getGlobalNode().addFields({
+    api: data,
+  })
   this.screen.show()
 
   while (true) {

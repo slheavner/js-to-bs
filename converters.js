@@ -1,6 +1,25 @@
 const formatParams = params => {
   return params.map(node => node.bs).join(', ')
 }
+
+const formatOperator = op => {
+  if (op === '!') {
+    op = 'not'
+  } else if (op.startsWith('!=')) {
+    op = '<>'
+  } else if (op.startsWith('==')) {
+    op = '='
+  } else if (op === '&&') {
+    op = 'and'
+  } else if (op === '||') {
+    op = 'or'
+  } else if (['&', '|', '<<', '>>', '+', '-', '/', '*', '<', '>'].includes(op)) {
+  } else {
+    console.error('unable to recognize operator ' + op)
+  }
+  return op
+}
+
 module.exports = {
   StringLiteral: node => {
     return `"${node.value.replace(/"/g, '""')}"`
@@ -9,7 +28,7 @@ module.exports = {
     return node.name
   },
   VariableDeclarator: node => {
-    return node.init ? `${node.id.bs}= ${node.init.bs}` : `${node.id.bs} = invalid`
+    return node.init ? `${node.id.bs} = ${node.init.bs}` : `${node.id.bs} = invalid`
   },
   VariableDeclaration: node => {
     return node.declarations.map(node => node.bs).join('\n')
@@ -126,11 +145,11 @@ ${node.elements.map(node => node.bs).join(',\n')}
     if (node.operator === 'typeof') {
       return `type(${node.argument.bs})`
     } else {
-      return `${formatOperator(node.operator)},${node.argument.bs}`
+      return `${formatOperator(node.operator)} ${node.argument.bs}`
     }
   },
   LogicalExpression: node => {
-    return `${node.left.bs},${formatOperator(node.operator)},${node.right.bs}`
+    return `${node.left.bs} ${formatOperator(node.operator)} ${node.right.bs}`
   },
   NewExpression: node => {
     params = node.arguments.length === 0 ? '' : `, ${node.arguments.map(v => v.bs).join(', ')}`
